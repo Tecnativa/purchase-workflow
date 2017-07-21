@@ -22,18 +22,3 @@ class PurchaseOrder(models.Model):
         return super(PurchaseOrder, self).search(
             cr, uid, args, offset=offset, limit=limit, order=order,
             context=context, count=count)
-
-
-class PurchaseOrderLine(models.Model):
-    _inherit = 'purchase.order.line'
-
-    def search(self, cr, uid, args, offset=0, limit=None, order=None,
-               context=None, count=False):
-        # Restrict the empty return for these conditions
-        if (context and context.get('grouping', 'standard') == 'line' and
-                len(args) == 1 and args[0][0] == 'order_id' and
-                args[0][1] == 'in'):
-            return []
-        return super(PurchaseOrderLine, self).search(
-            cr, uid, args, offset=offset, limit=limit, order=order,
-            context=context, count=count)

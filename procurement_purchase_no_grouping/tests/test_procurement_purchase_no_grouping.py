@@ -22,6 +22,7 @@ class TestProcurementPurchaseNoGrouping(common.SavepointCase):
                 (0, 0, {
                     'name': cls.partner.id,
                     'min_qty': 1.0,
+                    'price': 10,
                 }),
             ]}
         )
@@ -40,7 +41,7 @@ class TestProcurementPurchaseNoGrouping(common.SavepointCase):
 
     def test_procurement_grouped_purchase(self):
         self.category.procured_purchase_grouping = 'standard'
-        procurement_1 = self.procurement.copy()
+        procurement_1 = self.procurement
         procurement_2 = self.procurement.copy()
         procurement_1.run()
         procurement_2.run()
@@ -58,7 +59,7 @@ class TestProcurementPurchaseNoGrouping(common.SavepointCase):
 
     def test_procurement_no_grouping_line_purchase(self):
         self.category.procured_purchase_grouping = 'line'
-        procurement_1 = self.procurement.copy()
+        procurement_1 = self.procurement
         procurement_2 = self.procurement.copy()
         procurement_1.run()
         procurement_2.run()
@@ -68,6 +69,8 @@ class TestProcurementPurchaseNoGrouping(common.SavepointCase):
             procurement_1.purchase_id, procurement_2.purchase_id,
             'Procured purchase orders are not the same',
         )
+        # To be sure the hack doesn't affect the rest
+        self.assertEqual(procurement_1.purchase_id.amount_untaxed, 20)
         self.assertNotEqual(
             procurement_1.purchase_line_id, procurement_2.purchase_line_id,
             'Procured purchase orders lines are the same',
@@ -76,7 +79,7 @@ class TestProcurementPurchaseNoGrouping(common.SavepointCase):
 
     def test_procurement_no_grouping_order_purchase(self):
         self.category.procured_purchase_grouping = 'order'
-        procurement_1 = self.procurement.copy()
+        procurement_1 = self.procurement
         procurement_2 = self.procurement.copy()
         procurement_1.run()
         procurement_2.run()
