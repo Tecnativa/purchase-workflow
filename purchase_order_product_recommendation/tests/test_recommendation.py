@@ -8,7 +8,7 @@ from odoo.tests.common import SavepointCase
 class RecommendationCase(SavepointCase):
     @classmethod
     def setUpClass(cls):
-        super(RecommendationCase, cls).setUpClass()
+        super().setUpClass()
         cls.partner = cls.env["res.partner"].create({"name": "Mr. Odoo"})
         cls.category_obj = cls.env["product.category"]
         cls.categ1 = cls.category_obj.create({"name": "Test Cat 1"})

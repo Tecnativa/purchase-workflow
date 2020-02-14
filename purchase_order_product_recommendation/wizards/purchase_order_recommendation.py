@@ -73,7 +73,6 @@ class PurchaseOrderRecommendation(models.TransientModel):
             raise UserError(_("This wizard is only valid for purchases"))
         return self.env.context.get("active_id", False)
 
-    @api.multi
     def _get_total_days(self):
         """Compute days between the initial and the end date"""
         day = (self.date_end + timedelta(days=1) - self.date_begin).days
@@ -130,7 +129,6 @@ class PurchaseOrderRecommendation(models.TransientModel):
             domain += [("categ_id", "in", self.product_category_ids.ids)]
         return domain
 
-    @api.multi
     def _find_move_line(self, src="internal", dst="customer"):
         """"Returns a dictionary from the move lines in a range of dates
             from and to given location types"""
@@ -215,7 +213,6 @@ class PurchaseOrderRecommendation(models.TransientModel):
             "is_modified": vals.get("is_modified", False),
         }
 
-    @api.multi
     @api.onchange(
         "order_id",
         "date_begin",
@@ -266,7 +263,6 @@ class PurchaseOrderRecommendation(models.TransientModel):
                 break
         self.line_ids = self.line_ids.sorted(key=lambda x: x.product_id.name)
 
-    @api.multi
     def action_accept(self):
         """Propagate recommendations to purchase order."""
         po_lines = self.env["purchase.order.line"]
@@ -329,12 +325,10 @@ class PurchaseOrderRecommendationLine(models.TransientModel):
             uom_id=self.product_id.uom_po_id,
         ).price
 
-    @api.multi
     def _prepare_update_po_line(self):
         """So we can extend PO update"""
         return {"product_qty": self.units_included}
 
-    @api.multi
     def _prepare_new_po_line(self, sequence):
         """So we can extend PO create"""
         return {

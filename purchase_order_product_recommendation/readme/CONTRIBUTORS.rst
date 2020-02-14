@@ -2,3 +2,4 @@
 
   * David Vidal
   * Ernesto Tejeda
+  * Alexandre Díaz
