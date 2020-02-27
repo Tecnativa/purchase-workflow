@@ -64,7 +64,6 @@
             model="ir.actions.act_window">
         <field name="name">Recommended Products for this Customer</field>
         <field name="res_model">purchase.order.recommendation</field>
-        <field name="view_type">form</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
     </record>

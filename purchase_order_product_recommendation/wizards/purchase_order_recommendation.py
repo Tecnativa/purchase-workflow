@@ -6,8 +6,6 @@ from datetime import datetime, timedelta
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
-from odoo.addons import decimal_precision as dp
-
 
 class PurchaseOrderRecommendation(models.TransientModel):
     _name = "purchase.order.recommendation"
@@ -172,8 +170,10 @@ class PurchaseOrderRecommendation(models.TransientModel):
         if self.warehouse_ids:
             units_available = sum(
                 [
-                    product_id.with_context(warehouse=wh).qty_available
-                    for wh in self.warehouse_ids.ids
+                    product_id.with_context(
+                        warehouse=[wh.id], lot_id=wh.mapped("view_location_id").ids
+                    ).qty_available
+                    for wh in self.warehouse_ids
                 ]
             )
             units_virtual_available = sum(
@@ -299,9 +299,7 @@ class PurchaseOrderRecommendationLine(models.TransientModel):
     times_received = fields.Integer(readonly=True)
     units_received = fields.Float(readonly=True)
     units_delivered = fields.Float(readonly=True)
-    units_avg_delivered = fields.Float(
-        digits=dp.get_precision("Product Unit of Measure"), readonly=True
-    )
+    units_avg_delivered = fields.Float(digits="Product Unit of Measure", readonly=True)
     units_available = fields.Float(readonly=True)
     units_virtual_available = fields.Float(readonly=True)
     units_included = fields.Float()

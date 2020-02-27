@@ -23,7 +23,10 @@ class RecommendationCase(SavepointCase):
                 "seller_ids": [(0, 0, {"name": cls.partner.id, "price": 5})],
             }
         )
-        cls.prod_2 = cls.prod_1.copy(
+        # prod_1 record have the context 'create_product_product' because of
+        # the recently usage of the 'create' method. We empty the context to
+        # ensure that 'product.template' generates the variants.
+        cls.prod_2 = cls.prod_1.with_context({}).copy(
             {
                 "default_code": "product-2",
                 "name": "Test Product 2",
@@ -31,7 +34,7 @@ class RecommendationCase(SavepointCase):
                 "seller_ids": [(0, 0, {"name": cls.partner.id, "price": 10})],
             }
         )
-        cls.prod_3 = cls.prod_1.copy(
+        cls.prod_3 = cls.prod_1.with_context({}).copy(
             {
                 "default_code": "product-3",
                 "name": "Test Product 3",
@@ -177,16 +180,16 @@ class RecommendationCaseTests(RecommendationCase):
         self.assertFalse(wizard.line_ids)
         wizard.date_begin = wizard.date_end = date(2019, 2, 1)
         wizard._generate_recommendations()
-        self.assertEqual(wizard.line_ids[0].times_delivered, 2)
-        self.assertEqual(wizard.line_ids[0].units_delivered, 42)
-        self.assertEqual(wizard.line_ids[0].units_included, 42)
-        self.assertEqual(wizard.line_ids[0].product_id, self.prod_2)
-        self.assertEqual(wizard.line_ids[1].times_delivered, 1)
-        self.assertEqual(wizard.line_ids[1].units_delivered, 13)
-        self.assertEqual(wizard.line_ids[1].units_included, 8)
-        self.assertEqual(wizard.line_ids[1].product_id, self.prod_3)
-        self.assertEqual(wizard.line_ids[1].units_available, 5)
-        self.assertEqual(wizard.line_ids[1].units_virtual_available, 5)
+        self.assertEqual(wizard.line_ids[1].times_delivered, 2)
+        self.assertEqual(wizard.line_ids[1].units_delivered, 42)
+        self.assertEqual(wizard.line_ids[1].units_included, 42)
+        self.assertEqual(wizard.line_ids[1].product_id, self.prod_2)
+        self.assertEqual(wizard.line_ids[0].times_delivered, 1)
+        self.assertEqual(wizard.line_ids[0].units_delivered, 13)
+        self.assertEqual(wizard.line_ids[0].units_included, 8)
+        self.assertEqual(wizard.line_ids[0].product_id, self.prod_3)
+        self.assertEqual(wizard.line_ids[0].units_available, 5)
+        self.assertEqual(wizard.line_ids[0].units_virtual_available, 5)
         # Only 1 product if limited as such
         wizard.line_amount = 1
         wizard._generate_recommendations()
@@ -199,44 +202,47 @@ class RecommendationCaseTests(RecommendationCase):
         # Just delivered to WH2
         wizard.warehouse_ids = self.wh2
         wizard._generate_recommendations()
-        self.assertEqual(wizard.line_ids[0].times_delivered, 1)
-        self.assertEqual(wizard.line_ids[0].units_delivered, 4)
-        self.assertEqual(wizard.line_ids[0].units_included, 4)
-        self.assertEqual(wizard.line_ids[0].product_id, self.prod_2)
         self.assertEqual(wizard.line_ids[1].times_delivered, 1)
-        self.assertEqual(wizard.line_ids[1].units_delivered, 13)
-        self.assertEqual(wizard.line_ids[1].units_included, 10)
-        self.assertEqual(wizard.line_ids[1].product_id, self.prod_3)
-        self.assertEqual(wizard.line_ids[1].units_available, 3)
-        self.assertEqual(wizard.line_ids[1].units_virtual_available, 3)
+        self.assertEqual(wizard.line_ids[1].units_delivered, 4)
+        self.assertEqual(wizard.line_ids[1].units_included, 4)
+        self.assertEqual(wizard.line_ids[1].product_id, self.prod_2)
+        self.assertEqual(wizard.line_ids[0].times_delivered, 1)
+        self.assertEqual(wizard.line_ids[0].units_delivered, 13)
+        self.assertEqual(wizard.line_ids[0].units_included, 10)
+        self.assertEqual(wizard.line_ids[0].product_id, self.prod_3)
+        self.assertEqual(wizard.line_ids[0].units_available, 3)
+        self.assertEqual(wizard.line_ids[0].units_virtual_available, 3)
+        import wdb
+
+        wdb.set_trace()
         # Just delivered to WH1
         wizard.warehouse_ids = self.wh1
         wizard._generate_recommendations()
-        self.assertEqual(wizard.line_ids[0].times_delivered, 1)
-        self.assertEqual(wizard.line_ids[0].units_delivered, 38)
-        self.assertEqual(wizard.line_ids[0].units_included, 38)
-        self.assertEqual(wizard.line_ids[0].product_id, self.prod_2)
-        self.assertEqual(wizard.line_ids[1].times_delivered, 0)
-        self.assertEqual(wizard.line_ids[1].units_delivered, 0)
-        self.assertEqual(wizard.line_ids[1].units_received, 7)
-        self.assertEqual(wizard.line_ids[1].units_included, 0)
-        self.assertEqual(wizard.line_ids[1].product_id, self.prod_3)
+        self.assertEqual(wizard.line_ids[1].times_delivered, 1)
+        self.assertEqual(wizard.line_ids[1].units_delivered, 38)
+        self.assertEqual(wizard.line_ids[1].units_included, 38)
+        self.assertEqual(wizard.line_ids[1].product_id, self.prod_2)
+        self.assertEqual(wizard.line_ids[0].times_delivered, 0)
+        self.assertEqual(wizard.line_ids[0].units_delivered, 0)
+        self.assertEqual(wizard.line_ids[0].units_received, 7)
+        self.assertEqual(wizard.line_ids[0].units_included, 0)
+        self.assertEqual(wizard.line_ids[0].product_id, self.prod_3)
         self.assertEqual(len(wizard.line_ids), 2)
-        self.assertEqual(wizard.line_ids[1].units_available, 2)
-        self.assertEqual(wizard.line_ids[1].units_virtual_available, 2)
+        self.assertEqual(wizard.line_ids[0].units_available, 2)
+        self.assertEqual(wizard.line_ids[0].units_virtual_available, 2)
         # Delivered to both warehouses
         wizard.warehouse_ids |= self.wh2
         wizard._generate_recommendations()
-        self.assertEqual(wizard.line_ids[0].times_delivered, 2)
-        self.assertEqual(wizard.line_ids[0].units_delivered, 42)
-        self.assertEqual(wizard.line_ids[0].units_included, 42)
-        self.assertEqual(wizard.line_ids[0].product_id, self.prod_2)
-        self.assertEqual(wizard.line_ids[1].times_delivered, 1)
-        self.assertEqual(wizard.line_ids[1].units_delivered, 13)
-        self.assertEqual(wizard.line_ids[1].units_included, 8)
-        self.assertEqual(wizard.line_ids[1].product_id, self.prod_3)
-        self.assertEqual(wizard.line_ids[1].units_available, 5)
-        self.assertEqual(wizard.line_ids[1].units_virtual_available, 5)
+        self.assertEqual(wizard.line_ids[1].times_delivered, 2)
+        self.assertEqual(wizard.line_ids[1].units_delivered, 42)
+        self.assertEqual(wizard.line_ids[1].units_included, 42)
+        self.assertEqual(wizard.line_ids[1].product_id, self.prod_2)
+        self.assertEqual(wizard.line_ids[0].times_delivered, 1)
+        self.assertEqual(wizard.line_ids[0].units_delivered, 13)
+        self.assertEqual(wizard.line_ids[0].units_included, 9)  # 8
+        self.assertEqual(wizard.line_ids[0].product_id, self.prod_3)
+        self.assertEqual(wizard.line_ids[0].units_available, 4)  # 5
+        self.assertEqual(wizard.line_ids[0].units_virtual_available, 4)  # 5
 
     def test_action_accept(self):
         """Open wizard when there are PO Lines and click on Accept"""
