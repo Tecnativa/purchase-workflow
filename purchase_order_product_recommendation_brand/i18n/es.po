@@ -1,4 +1,3 @@
-# Translation of Odoo Server.
 # This file contains the translation of the following modules:
 #	* purchase_order_product_recommendation_brand
 #
@@ -22,4 +21,3 @@ msgstr "Marcas"
 #: model:ir.model,name:purchase_order_product_recommendation_brand.model_purchase_order_recommendation
 msgid "Recommended products for current purchase order"
 msgstr "Productos recomendados para la orden de compra actual"
-
