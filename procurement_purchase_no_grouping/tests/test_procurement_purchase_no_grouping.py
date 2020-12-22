@@ -1,4 +1,4 @@
-# Copyright 2015-2017 - Pedro M. Baeza <pedro.baeza@tecnativa.com>
+# Copyright 2015-2017 Tecnativa - Pedro M. Baeza
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 from odoo import fields
@@ -31,12 +31,12 @@ class TestProcurementPurchaseNoGrouping(common.SavepointCase):
             "date_planned": fields.Datetime.now(),
         }
 
-    def _run_procurement(self):
+    def _run_procurement(self, product):
         procurement_group_obj = self.env["procurement.group"]
         procurement = procurement_group_obj.Procurement(
-            self.product,
+            product,
             1,
-            self.product.uom_id,
+            product.uom_id,
             self.location,
             False,
             self.origin,
@@ -53,8 +53,8 @@ class TestProcurementPurchaseNoGrouping(common.SavepointCase):
 
     def test_procurement_grouped_purchase(self):
         self.category.procured_purchase_grouping = "standard"
-        self._run_procurement()
-        self._run_procurement()
+        self._run_procurement(self.product)
+        self._run_procurement(self.product)
         orders = self.env["purchase.order"].search([("origin", "=", self.origin)])
         self.assertEqual(len(orders), 1, "Procured purchase orders are not the same")
         self.assertEqual(
@@ -63,8 +63,8 @@ class TestProcurementPurchaseNoGrouping(common.SavepointCase):
 
     def test_procurement_no_grouping_line_purchase(self):
         self.category.procured_purchase_grouping = "line"
-        self._run_procurement()
-        self._run_procurement()
+        self._run_procurement(self.product)
+        self._run_procurement(self.product)
         orders = self.env["purchase.order"].search([("origin", "=", self.origin)])
         self.assertEqual(len(orders), 1, "Procured purchase orders are not the same")
         self.assertEqual(
@@ -73,8 +73,8 @@ class TestProcurementPurchaseNoGrouping(common.SavepointCase):
 
     def test_procurement_no_grouping_order_purchase(self):
         self.category.procured_purchase_grouping = "order"
-        self._run_procurement()
-        self._run_procurement()
+        self._run_procurement(self.product)
+        self._run_procurement(self.product)
         orders = self.env["purchase.order"].search([("origin", "=", self.origin)])
         self.assertEqual(len(orders), 2, "Procured purchase orders are the same")
         self.assertEqual(
@@ -86,8 +86,8 @@ class TestProcurementPurchaseNoGrouping(common.SavepointCase):
     def test_procurement_system_grouped_purchase(self):
         self.category.procured_purchase_grouping = None
         self._set_system_grouping("standard")
-        self._run_procurement()
-        self._run_procurement()
+        self._run_procurement(self.product)
+        self._run_procurement(self.product)
         orders = self.env["purchase.order"].search([("origin", "=", self.origin)])
         self.assertEqual(len(orders), 1, "Procured purchase orders are not the same")
         self.assertEqual(
@@ -97,8 +97,8 @@ class TestProcurementPurchaseNoGrouping(common.SavepointCase):
     def test_procurement_system_no_grouping_line_purchase(self):
         self.category.procured_purchase_grouping = None
         self._set_system_grouping("line")
-        self._run_procurement()
-        self._run_procurement()
+        self._run_procurement(self.product)
+        self._run_procurement(self.product)
         orders = self.env["purchase.order"].search([("origin", "=", self.origin)])
         self.assertEqual(len(orders), 1, "Procured purchase orders are not the same")
         self.assertEqual(
@@ -108,8 +108,8 @@ class TestProcurementPurchaseNoGrouping(common.SavepointCase):
     def test_procurement_system_no_grouping_order_purchase(self):
         self.category.procured_purchase_grouping = None
         self._set_system_grouping("order")
-        self._run_procurement()
-        self._run_procurement()
+        self._run_procurement(self.product)
+        self._run_procurement(self.product)
         orders = self.env["purchase.order"].search([("origin", "=", self.origin)])
         self.assertEqual(len(orders), 2, "Procured purchase orders are the same")
         self.assertEqual(
@@ -117,3 +117,30 @@ class TestProcurementPurchaseNoGrouping(common.SavepointCase):
             2,
             "Procured purchase orders lines are the same",
         )
+
+    def test_procurement_products_category_grouped_order_purchase(self):
+        self.category.procured_purchase_grouping = "product_category"
+        self._run_procurement(self.product)
+        product2 = self.product.copy()
+        product2.write(
+            {"seller_ids": [(0, 0, {"name": self.partner.id, "min_qty": 1.0})]}
+        )
+        self._run_procurement(product2)
+        orders = self.env["purchase.order"].search([("origin", "=", self.origin)])
+        self.assertEqual(len(orders), 1)
+        self.assertEqual(len(orders.mapped("order_line")), 2)
+
+    def test_procurement_products_distinct_category_grouped_order_purchase(self):
+        self.category.procured_purchase_grouping = "product_category"
+        category2 = self.category.copy()
+        self._run_procurement(self.product)
+        product2 = self.product.copy()
+        product2.write(
+            {
+                "categ_id": category2.id,
+                "seller_ids": [(0, 0, {"name": self.partner.id, "min_qty": 1.0})],
+            }
+        )
+        self._run_procurement(product2)
+        orders = self.env["purchase.order"].search([("origin", "=", self.origin)])
+        self.assertEqual(len(orders), 2)
