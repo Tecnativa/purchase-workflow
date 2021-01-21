@@ -1,4 +1,5 @@
 # Copyright 2015-2017 Tecnativa - Pedro M. Baeza
+# Copyright 2021 Tecnativa - Víctor Matínez
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 from odoo import fields
@@ -121,9 +122,12 @@ class TestProcurementPurchaseNoGrouping(common.SavepointCase):
     def test_procurement_products_category_grouped_order_purchase(self):
         self.category.procured_purchase_grouping = "product_category"
         self._run_procurement(self.product)
-        product2 = self.product.copy()
-        product2.write(
-            {"seller_ids": [(0, 0, {"name": self.partner.id, "min_qty": 1.0})]}
+        product2 = self.env["product.product"].create(
+            {
+                "name": "Test product",
+                "categ_id": self.category.id,
+                "seller_ids": [(0, 0, {"name": self.partner.id, "min_qty": 1.0})],
+            }
         )
         self._run_procurement(product2)
         orders = self.env["purchase.order"].search([("origin", "=", self.origin)])
@@ -134,13 +138,13 @@ class TestProcurementPurchaseNoGrouping(common.SavepointCase):
         self.category.procured_purchase_grouping = "product_category"
         category2 = self.category.copy()
         self._run_procurement(self.product)
-        product2 = self.product.copy()
-        product2.write(
+        product2 = self.env["product.product"].create(
             {
+                "name": "Test product",
                 "categ_id": category2.id,
                 "seller_ids": [(0, 0, {"name": self.partner.id, "min_qty": 1.0})],
             }
         )
         self._run_procurement(product2)
         orders = self.env["purchase.order"].search([("origin", "=", self.origin)])
-        self.assertEqual(len(orders), 2)
+        self.assertEqual(len(orders), 1)
