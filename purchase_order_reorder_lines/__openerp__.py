@@ -30,6 +30,7 @@
     'depends': [
         'purchase',
         'stock_picking_reorder_lines',
+        'purchase_partial_invoicing'
     ],
     'data': ['views/purchase_view.xml'],
     'demo': [],
