@@ -30,10 +30,7 @@ class PurchaseOrderLine(models.Model):
                 bom_type="phantom",
             ):
                 continue
-            line.move_ids.mapped("stock_valuation_layer_ids").filtered(
-                # Filter children SVLs (like landed cost)
-                lambda x: not x.stock_valuation_layer_id
-            ).write(
+            line.move_ids.mapped("stock_valuation_layer_ids").write(
                 {
                     "unit_cost": line.with_context(
                         skip_stock_price_unit_sync=True
