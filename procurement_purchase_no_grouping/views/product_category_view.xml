@@ -7,6 +7,7 @@
             <xpath expr="//group[@name='first']" position="after">
                 <group>
                     <field name="procured_purchase_grouping" />
+                    <field name="max_days_grouping" />
                 </group>
             </xpath>
         </field>

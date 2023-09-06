@@ -7,7 +7,10 @@
 
 import random
 
-from odoo import models
+import pytz
+from dateutil.relativedelta import relativedelta
+
+from odoo import fields, models
 
 
 class StockRule(models.Model):
@@ -18,7 +21,15 @@ class StockRule(models.Model):
             grouping = procurement.product_id.categ_id.procured_purchase_grouping
             if not grouping:
                 grouping = self.env.company.procured_purchase_grouping
-            procurement.values["grouping"] = grouping
+            max_days_grouping = procurement.product_id.categ_id.max_days_grouping
+            if not max_days_grouping:
+                max_days_grouping = self.env.company.max_days_grouping
+            procurement.values.update(
+                {
+                    "grouping": grouping,
+                    "max_days_grouping": max_days_grouping,
+                }
+            )
         return super()._run_buy(procurements)
 
     def _make_po_get_domain(self, company_id, values, partner):
@@ -42,4 +53,21 @@ class StockRule(models.Model):
                 domain += (("id", "=", -values["move_dest_ids"][:1].id),)
             # The minimum is imposed by PG int4 limit
             domain += (("id", "=", random.randint(-2147483648, 0)),)
+        max_days_grouping = values.get("max_days_grouping", 0)
+        if max_days_grouping:
+            purchase_date = values["date_planned"] - relativedelta(
+                days=values["supplier"].delay
+            )
+            purchase_date = max(purchase_date, fields.Datetime.now())
+
+            max_date = purchase_date + relativedelta(days=max_days_grouping - 1)
+            max_date = fields.datetime.combine(max_date, fields.datetime.max.time())
+            min_date = purchase_date - relativedelta(days=max_days_grouping - 1)
+            min_date = fields.datetime.combine(min_date, fields.datetime.min.time())
+
+            user_tz = pytz.timezone(self.env.user.tz or "UTC")
+            utc_tz = pytz.timezone("UTC")
+            max_date = user_tz.localize(max_date).astimezone(utc_tz)
+            min_date = user_tz.localize(min_date).astimezone(utc_tz)
+            domain += (("date_order", ">=", min_date), ("date_order", "<=", max_date))
         return domain

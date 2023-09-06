@@ -30,3 +30,4 @@ class ProductCategory(models.Model):
         "* Product category grouping: This option groups products in the "
         "same purchase order that belongs to the same product category.",
     )
+    max_days_grouping = fields.Integer()

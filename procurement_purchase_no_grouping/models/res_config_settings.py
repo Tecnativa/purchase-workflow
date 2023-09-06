@@ -14,3 +14,6 @@ class ResConfigSettings(models.TransientModel):
         related="company_id.procured_purchase_grouping",
         readonly=False,
     )
+    max_days_grouping = fields.Integer(
+        related="company_id.max_days_grouping", readonly=False
+    )
