@@ -450,12 +450,6 @@
                             />
                             <field name="date_planned" widget="date" readonly="1" />
                             <field
-                                name="company_id"
-                                readonly="1"
-                                groups="base.group_multi_company"
-                                options="{'no_create': True}"
-                            />
-                            <field
                                 name="analytic_distribution"
                                 widget="analytic_distribution"
                                 groups="analytic.group_analytic_accounting"
