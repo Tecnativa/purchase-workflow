@@ -26,6 +26,3 @@ msgstr "Solicitud de compra"
 #: model:ir.model,name:purchase_requisition_grouped_by_procurement.model_stock_rule
 msgid "Stock Rule"
 msgstr "Regla de Inventario"
-
-#~ msgid "Group"
-#~ msgstr "Grupo"

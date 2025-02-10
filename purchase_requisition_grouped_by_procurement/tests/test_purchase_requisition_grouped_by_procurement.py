@@ -2,10 +2,11 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import fields
-from odoo.tests import TransactionCase
+
+from odoo.addons.base.tests.common import BaseCommon
 
 
-class TestPurchaseRequisitionGgroupedbyProcurement(TransactionCase):
+class TestPurchaseRequisitionGgroupedbyProcurement(BaseCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
