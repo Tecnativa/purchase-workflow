@@ -96,6 +96,9 @@ Lines.
 
 It is possible to filter requests by its approval status.
 
+It is possible to skip the email sent when validating the picking with
+the system parameter: key=purchase_request.skip_picking_mail value=1
+
 Bug Tracker
 ===========
 
@@ -117,15 +120,15 @@ Authors
 Contributors
 ------------
 
-- Jordi Ballester Alomar <jordi.ballester@forgeflow.com>
-- Jonathan Nemry <jonathan.nemry@acsone.eu>
-- Aaron Henriquez <ahenriquez@forgeflow.com>
-- Adrien Peiffer <adrien.peiffer@acsone.eu>
-- Lois Rilo <lois.rilo@forgeflow.com>
-- Héctor Villarreal <hector.villarreal@forgeflow.com>
-- Ben Cai <ben.cai@elico-corp.com>
-- Rattapong Chokmasermkul <rattapongc@ecosoft.co.th>
-- Stefan Rijnhart <stefan@opener.amsterdam>
+-  Jordi Ballester Alomar <jordi.ballester@forgeflow.com>
+-  Jonathan Nemry <jonathan.nemry@acsone.eu>
+-  Aaron Henriquez <ahenriquez@forgeflow.com>
+-  Adrien Peiffer <adrien.peiffer@acsone.eu>
+-  Lois Rilo <lois.rilo@forgeflow.com>
+-  Héctor Villarreal <hector.villarreal@forgeflow.com>
+-  Ben Cai <ben.cai@elico-corp.com>
+-  Rattapong Chokmasermkul <rattapongc@ecosoft.co.th>
+-  Stefan Rijnhart <stefan@opener.amsterdam>
 
 Other credits
 -------------
@@ -137,7 +140,7 @@ The development of this module has been financially supported by:
 Images
 ~~~~~~
 
-- Enric Tobella (logo)
+-  Enric Tobella (logo)
 
 .. |Aleph Objects, Inc| image:: https://upload.wikimedia.org/wikipedia/en/3/3b/Aleph_Objects_Logo.png
    :target: https://www.alephobjects.com

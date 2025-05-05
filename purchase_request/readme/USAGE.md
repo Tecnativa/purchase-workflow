@@ -5,3 +5,8 @@ Users can access the list of Purchase Requests or Purchase Request
 Lines.
 
 It is possible to filter requests by its approval status.
+
+It is possible to skip the email sent when validating the picking with
+the system parameter:
+key=purchase_request.skip_picking_mail
+value=1

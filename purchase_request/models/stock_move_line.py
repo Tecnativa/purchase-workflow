@@ -75,6 +75,7 @@ class StockMoveLine(models.Model):
         }
 
     def allocate(self):
+        icp = self.env["ir.config_parameter"].sudo()
         for ml in self.filtered(
             lambda m: m.exists() and m.move_id.purchase_request_allocation_ids
         ):
@@ -111,6 +112,8 @@ class StockMoveLine(models.Model):
                             body=message, subtype_id=self.env.ref("mail.mt_comment").id
                         )
 
+                    if icp.get_param("purchase_request.skip_picking_mail"):
+                        continue
                     picking_message = self._picking_confirm_done_message_content(
                         message_data
                     )
