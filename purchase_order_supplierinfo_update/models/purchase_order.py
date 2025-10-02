@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from odoo import api, fields, models
+from odoo.tools.float_utils import float_compare
 
 
 class PurchaseOrder(models.Model):
@@ -68,5 +69,12 @@ class PurchaseOrderLine(models.Model):
                 new_seller_price, seller.product_uom
             )
         # Set price
-        if new_seller_price != seller.price:
+        if (
+            float_compare(
+                new_seller_price,
+                seller.price,
+                precision_rounding=self.currency_id.rounding,
+            )
+            != 0
+        ):
             seller.sudo().price = new_seller_price
