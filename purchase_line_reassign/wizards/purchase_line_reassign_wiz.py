@@ -13,7 +13,7 @@ class PurchaseOrderLineReassignWiz(models.TransientModel):
         lines = self.env["purchase.order.line"].browse(active_ids)
         partner = lines[:1].order_id.partner_id
         if lines.filtered(
-            lambda line: (line.invoice_lines or line.partner_id != partner)
+            lambda line: line.invoice_lines or line.partner_id != partner
         ):
             raise exceptions.ValidationError(
                 self.env._("Selected line/s are invoiced or they have distinct vendors")
