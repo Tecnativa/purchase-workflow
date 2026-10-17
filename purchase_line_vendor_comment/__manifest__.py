@@ -4,7 +4,7 @@
 {
     "name": "Purchase Line Vendor Comment",
     "summary": """Add the vendor comment field in purchase order lines""",
-    "version": "18.0.1.0.0",
+    "version": "20.0.1.0.0",
     "license": "LGPL-3",
     "website": "https://github.com/OCA/purchase-workflow",
     "author": "Tecnativa, Odoo Community Association (OCA)",
