@@ -19,7 +19,7 @@ class TestSalePurchaseForceVendor(TestSalePurchaseForceVendorBase):
         self.assertIn(self.vendor_b, self.product_b.seller_ids.mapped("partner_id"))
 
     def test_misc_force_vendor_restrict(self):
-        self.env.company.sale_purchase_force_vendor_restrict = True
+        self.env.company.sudo().sale_purchase_force_vendor_restrict = True
         self.sale_order.action_confirm()
         partners_sol_a = self.env["res.partner"].search(self.sol_a.vendor_id_domain)
         self.assertNotIn(self.partner, partners_sol_a)
@@ -31,13 +31,18 @@ class TestSalePurchaseForceVendor(TestSalePurchaseForceVendorBase):
         self.assertIn(self.vendor_b, partners_sol_b)
 
     def test_misc_not_force_vendor_restrict(self):
-        self.env.company.sale_purchase_force_vendor_restrict = False
+        self.env.company.sudo().sale_purchase_force_vendor_restrict = False
         self.sale_order.action_confirm()
-        self.assertEqual(self.sol_a.vendor_id_domain, [])
-        self.assertEqual(self.sol_b.vendor_id_domain, [])
+        self.assertFalse(self.sol_a.vendor_id_domain)
+        self.assertFalse(self.sol_b.vendor_id_domain)
 
 
 class TestSalePurchaseForceVendorChainedMove(TestSaleOrderLineChainedMoveBase):
+    _test_user_groups = (
+        *TestSaleOrderLineChainedMoveBase._test_user_groups,
+        "product.group_product_manager",
+    )
+
     """
     This class makes a test with another route than the default Odoo MTO route.
     It uses the route defined in sale_order_line_chained_move, which is a

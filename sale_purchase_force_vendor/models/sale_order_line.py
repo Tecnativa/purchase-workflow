@@ -18,11 +18,7 @@ class SaleOrderLine(models.Model):
     vendor_id = fields.Many2one(
         comodel_name="res.partner",
     )
-    vendor_id_domain = fields.Binary(
-        compute="_compute_vendor_id_domain",
-        readonly=True,
-        store=False,
-    )
+    vendor_id_domain = fields.Json(compute="_compute_vendor_id_domain")
 
     @api.depends("product_id")
     def _compute_vendor_id_domain(self):
@@ -52,11 +48,12 @@ class SaleOrderLine(models.Model):
         res = super()._prepare_procurement_values()
         if self.vendor_id:
             product = self.product_id
-            suppinfo = product.with_company(self.company_id.id)._select_seller(
+            seller_info = product.with_company(self.company_id.id)._select_seller(
                 partner_id=self.vendor_id,
                 quantity=self.product_uom_qty,
                 uom_id=self.product_uom_id,
             )
+            suppinfo = seller_info.get("supplierinfo")
             if not suppinfo:
                 # By default user with group_sale_salesman group can not creates
                 # supplierinfo records.

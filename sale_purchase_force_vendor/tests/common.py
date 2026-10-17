@@ -7,6 +7,11 @@ from odoo.addons.base.tests.common import BaseCommon
 
 
 class TestSalePurchaseForceVendorBase(BaseCommon):
+    _test_user_groups = (
+        "sales_team.group_sale_salesman_all_leads",
+        "purchase.group_purchase_user",
+    )
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -14,9 +19,10 @@ class TestSalePurchaseForceVendorBase(BaseCommon):
         cls.vendor_a = cls.env["res.partner"].create({"name": "Test vendor A"})
         cls.vendor_b = cls.env["res.partner"].create({"name": "Test vendor B"})
         cls.mto = cls.env.ref("stock.route_warehouse0_mto")
-        cls.mto.active = True
+        # Routes are linked to products only when they are selectable on them
+        cls.mto.write({"active": True, "product_selectable": True})
         cls.buy = cls.env.ref("purchase_stock.route_warehouse0_buy")
-        cls.buy.sale_selectable = True
+        cls.buy.write({"sale_selectable": True, "product_selectable": True})
         cls.product_a = cls.env["product.product"].create(
             {
                 "name": "Test product A",
@@ -46,14 +52,14 @@ class TestSalePurchaseForceVendorBase(BaseCommon):
                     Command.create(
                         {
                             "product_id": self.product_a.id,
-                            "route_id": self.mto.id,
+                            "route_ids": [(6, 0, self.mto.ids)],
                             "vendor_id": self.vendor_b.id,
                         }
                     ),
                     Command.create(
                         {
                             "product_id": self.product_b.id,
-                            "route_id": self.mto.id,
+                            "route_ids": [(6, 0, self.mto.ids)],
                             "vendor_id": self.vendor_b.id,
                         }
                     ),
