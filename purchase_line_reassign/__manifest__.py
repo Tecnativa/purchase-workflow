@@ -5,7 +5,7 @@
 {
     "name": "Purchase Line Reassign",
     "summary": "",
-    "version": "19.0.1.0.0",
+    "version": "20.0.1.0.0",
     "category": "Purchase Management",
     "website": "https://github.com/OCA/purchase-workflow",
     "author": "Tecnativa, Odoo Community Association (OCA)",
@@ -15,7 +15,7 @@
         "purchase",
     ],
     "data": [
-        "security/ir.model.access.csv",
         "wizards/purchase_line_reassign_view.xml",
+        "security/ir.access.csv",
     ],
 }

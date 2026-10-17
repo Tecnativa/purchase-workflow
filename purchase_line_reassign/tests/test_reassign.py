@@ -1,8 +1,6 @@
 # Copyright 2019 Alexandre Díaz <alexandre.diaz@tecnativa.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
-from datetime import datetime
-
-from odoo import Command
+from odoo import Command, fields
 from odoo.tests.common import TransactionCase
 
 
@@ -28,8 +26,8 @@ class TestReassign(TransactionCase):
                             "product_id": product.id,
                             "product_qty": 2,
                             "price_unit": 150.00,
-                            "date_planned": datetime.now(),
-                            "product_uom_id": self.env.ref("uom.product_uom_unit").id,
+                            "date_planned": fields.Datetime.now(),
+                            "uom_id": self.env.ref("uom.product_uom_unit").id,
                         },
                     )
                 ],
